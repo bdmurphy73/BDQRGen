@@ -3,7 +3,11 @@ package com.bdqrgen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Person
@@ -15,18 +19,25 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bdqrgen.ui.screens.ContactScreen
 import com.bdqrgen.ui.screens.SavedScreen
 import com.bdqrgen.ui.screens.WifiScreen
 import com.bdqrgen.ui.screens.WebsiteScreen
 import com.bdqrgen.viewmodel.QRViewModel
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +56,32 @@ data class BottomNavItem(
 @Composable
 fun BDQRGenApp() {
     val viewModel: QRViewModel = viewModel()
+    var showSplash by remember { mutableStateOf(true) }
     
+    LaunchedEffect(Unit) {
+        delay(1500)
+        showSplash = false
+    }
+    
+    if (showSplash) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.mipmap.ic_launcher),
+                contentDescription = "App Logo",
+                modifier = Modifier.size(200.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+    } else {
+        MainContent(viewModel = viewModel)
+    }
+}
+
+@Composable
+fun MainContent(viewModel: QRViewModel) {
     val navItems = listOf(
         BottomNavItem("Website", Icons.Default.Link),
         BottomNavItem("WiFi", Icons.Default.Wifi),

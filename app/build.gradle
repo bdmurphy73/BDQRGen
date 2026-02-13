@@ -43,6 +43,12 @@ android {
         }
     }
     buildToolsVersion '35.0.0'
+
+    sourceSets {
+        main {
+            res.exclude '**/ic_launcher_foreground.png'
+        }
+    }
 }
 
 kotlin {
