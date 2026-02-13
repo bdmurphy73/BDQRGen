@@ -9,3 +9,5 @@ Recommendations to readers.
 3) Think about graphical assets, icons you want it to have.
 
 I haven't gone through the process to publish this on the Play Store yet. Don't know if it will work.
+
+If you like the app, buy me a coffee. https://buymeacoffee.com/bdmurph73i
