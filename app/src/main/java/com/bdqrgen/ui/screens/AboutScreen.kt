@@ -18,10 +18,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.bdqrgen.AppVersion
@@ -69,20 +71,34 @@ fun AboutScreen(
             
             Spacer(modifier = Modifier.height(8.dp))
             
+            val buyMeACoffeeText = buildAnnotatedString {
+                append("You can support me by buying me a coffee. ")
+                withStyle(style = SpanStyle(color = Color.Blue)) {
+                    append("https://buymeacoffee.com/bdmurph73i")
+                }
+            }
+            
             TextButton(onClick = {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://buymeacoffee.com/bdmurph73i"))
                 context.startActivity(intent)
             }) {
-                Text("https://buymeacoffee.com/bdmurph73i")
+                Text(buyMeACoffeeText)
             }
             
             Spacer(modifier = Modifier.height(8.dp))
+            
+            val websiteText = buildAnnotatedString {
+                append("My website is: ")
+                withStyle(style = SpanStyle(color = Color.Blue)) {
+                    append("https://authorbdmurphy.com/")
+                }
+            }
             
             TextButton(onClick = {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://authorbdmurphy.com/"))
                 context.startActivity(intent)
             }) {
-                Text("Website: https://authorbdmurphy.com/")
+                Text(websiteText)
             }
             
             Spacer(modifier = Modifier.height(24.dp))
@@ -131,6 +147,15 @@ fun AboutScreen(
                 text = "In no event shall the developer be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software. You assume all responsibility for the use of the app and any consequences resulting from its misuse.",
                 style = MaterialTheme.typography.bodyMedium
             )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            TextButton(onClick = {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bdmurphy73/BDQRGen/blob/master/Privacy_TermsOfService.txt"))
+                context.startActivity(intent)
+            }) {
+                Text("Privacy Terms of Service", color = Color.Blue)
+            }
             
             Spacer(modifier = Modifier.height(60.dp))
         }

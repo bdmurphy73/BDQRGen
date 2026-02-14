@@ -109,18 +109,6 @@ fun WifiScreen(
             }
             
             if (state.bitmap != null) {
-                Text(
-                    text = "Network: $ssid",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Text(
-                    text = "Password: $password",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 QRActionButtons(

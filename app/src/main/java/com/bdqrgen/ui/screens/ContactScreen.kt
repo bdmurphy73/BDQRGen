@@ -239,27 +239,6 @@ fun ContactScreen(
             }
             
             if (state.bitmap != null) {
-                Text(
-                    text = "Name: $name",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                if (email.isNotBlank()) {
-                    Text(
-                        text = "Email: $email",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                if (phone.isNotBlank()) {
-                    Text(
-                        text = "Phone: $phone",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-                
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 QRActionButtons(

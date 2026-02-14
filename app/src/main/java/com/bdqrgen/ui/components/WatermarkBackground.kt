@@ -22,7 +22,7 @@ fun WatermarkBackground(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.mipmap.ic_launcher),
+            painter = painterResource(id = R.drawable.watermark_bg),
             contentDescription = "Watermark",
             modifier = Modifier
                 .size(300.dp)
