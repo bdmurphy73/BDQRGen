@@ -69,14 +69,6 @@ fun WifiScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-        Text(
-            text = "WiFi QR Code Generator",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
-        
-        Spacer(modifier = Modifier.height(20.dp))
-        
         OutlinedTextField(
             value = ssid,
             onValueChange = { ssid = it },
@@ -139,17 +131,21 @@ fun WifiScreen(
                             }
                         }
                     },
-                    onShare = {
-                        state.bitmap?.let { bitmap ->
-                            viewModel.shareQRCode(bitmap)
-                        }
-                    },
                     onEmail = {
-                        val wifiString = "WIFI:S:$ssid;T:WPA;P:$password;;"
-                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:?subject=WiFi QR Code&body=${Uri.encode(wifiString)}")
+                        state.bitmap?.let { bitmap ->
+                            val uri = viewModel.saveToCache(context, bitmap)
+                            if (uri != null) {
+                                val wifiString = "WIFI:S:$ssid;T:WPA;P:$password;;"
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "image/png"
+                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                    putExtra(Intent.EXTRA_SUBJECT, "QR Code - BDQRGen")
+                                    putExtra(Intent.EXTRA_TEXT, "WiFi Network: $ssid\nPassword: $password\n\n$wifiString")
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                context.startActivity(Intent.createChooser(intent, "Send QR Code"))
+                            }
                         }
-                        context.startActivity(intent)
                     },
                     enabled = state.bitmap != null
                 )

@@ -1,7 +1,10 @@
 package com.bdqrgen.ui.screens
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,14 +21,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -52,9 +58,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import android.graphics.BitmapFactory
-import androidx.compose.foundation.Image
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import com.bdqrgen.ui.components.WatermarkBackground
 import com.bdqrgen.viewmodel.QRViewModel
@@ -67,6 +72,7 @@ fun SavedScreen(
     val state by viewModel.savedImagesState.collectAsState()
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf<String?>(null) }
+    var selectedImage by remember { mutableStateOf<Pair<String, Uri>?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     
     val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -106,67 +112,63 @@ fun SavedScreen(
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
-        Text(
-            text = "Saved QR Codes",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 20.dp)
-        )
-        
-        if (!hasPermission) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if (!hasPermission) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Permission required to view saved QR codes",
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        TextButton(onClick = { permissionLauncher.launch(permission) }) {
+                            Text("Grant Permission")
+                        }
+                    }
+                }
+            } else if (state.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (state.images.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                        text = "Permission required to view saved QR codes",
+                        text = "No saved QR codes found.\nSave QR codes to see them here.",
                         style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextButton(onClick = { permissionLauncher.launch(permission) }) {
-                        Text("Grant Permission")
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(state.images) { (fileName, uri) ->
+                        SavedImageCard(
+                            fileName = fileName,
+                            uri = uri,
+                            onClick = { selectedImage = fileName to uri },
+                            onDelete = { showDeleteDialog = fileName }
+                        )
                     }
                 }
             }
-        } else if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (state.images.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "No saved QR codes found.\nSave QR codes to see them here.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-            }
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.images) { (fileName, uri) ->
-                    SavedImageCard(
-                        fileName = fileName,
-                        uri = uri,
-                        onDelete = { showDeleteDialog = fileName }
-                    )
-                }
-            }
+            
+            SnackbarHost(hostState = snackbarHostState)
         }
-        
-        SnackbarHost(hostState = snackbarHostState)
     }
     
     showDeleteDialog?.let { fileName ->
@@ -198,13 +200,103 @@ fun SavedScreen(
             }
         )
     }
+    
+    selectedImage?.let { (fileName, uri) ->
+        var bitmap by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+        
+        LaunchedEffect(uri) {
+            try {
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    bitmap = BitmapFactory.decodeStream(inputStream)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        
+        Dialog(
+            onDismissRequest = { selectedImage = null },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(onClick = { selectedImage = null }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close"
+                                )
+                            }
+                        }
+                        
+                        bitmap?.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = "QR Code",
+                                modifier = Modifier
+                                    .size(250.dp)
+                                    .padding(16.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                        
+                        Text(
+                            text = fileName.substringBeforeLast("."),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        
+                        Button(
+                            onClick = {
+                                bitmap?.let { bmp ->
+                                    val emailUri = viewModel.saveToCache(context, bmp)
+                                    if (emailUri != null) {
+                                        val intent = Intent(Intent.ACTION_SEND).apply {
+                                            type = "image/png"
+                                            putExtra(Intent.EXTRA_STREAM, emailUri)
+                                            putExtra(Intent.EXTRA_SUBJECT, "QR Code - BDQRGen")
+                                            putExtra(Intent.EXTRA_TEXT, "QR Code: $fileName")
+                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        }
+                                        context.startActivity(Intent.createChooser(intent, "Send QR Code"))
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Email,
+                                contentDescription = "Email"
+                            )
+                            Text("  Email QR Code")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
 private fun SavedImageCard(
     fileName: String,
-    uri: android.net.Uri,
+    uri: Uri,
+    onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
     val context = LocalContext.current
@@ -221,7 +313,9 @@ private fun SavedImageCard(
     }
     
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {

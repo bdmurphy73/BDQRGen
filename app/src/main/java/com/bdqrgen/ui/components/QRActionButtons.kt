@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -22,7 +21,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun QRActionButtons(
     onSave: () -> Unit,
-    onShare: () -> Unit,
     onEmail: () -> Unit,
     enabled: Boolean = true,
     modifier: Modifier = Modifier
@@ -46,21 +44,6 @@ fun QRActionButtons(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text("Save")
-        }
-        
-        Button(
-            onClick = onShare,
-            enabled = enabled,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF007AFF)
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Default.Share,
-                contentDescription = "Share"
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("Share")
         }
         
         Button(

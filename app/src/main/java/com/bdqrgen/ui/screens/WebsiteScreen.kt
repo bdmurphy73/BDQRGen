@@ -71,14 +71,6 @@ fun WebsiteScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-        Text(
-            text = "Website QR Code Generator",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
-        
-        Spacer(modifier = Modifier.height(20.dp))
-        
         OutlinedTextField(
             value = url,
             onValueChange = { url = it },
@@ -123,16 +115,20 @@ fun WebsiteScreen(
                             }
                         }
                     },
-                    onShare = {
-                        state.bitmap?.let { bitmap ->
-                            viewModel.shareQRCode(bitmap)
-                        }
-                    },
                     onEmail = {
-                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:?subject=QR Code&body=${Uri.encode(url)}")
+                        state.bitmap?.let { bitmap ->
+                            val uri = viewModel.saveToCache(context, bitmap)
+                            if (uri != null) {
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "image/png"
+                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                    putExtra(Intent.EXTRA_SUBJECT, "QR Code - BDQRGen")
+                                    putExtra(Intent.EXTRA_TEXT, "QR Code for: $url")
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                context.startActivity(Intent.createChooser(intent, "Send QR Code"))
+                            }
                         }
-                        context.startActivity(intent)
                     },
                     enabled = state.bitmap != null
                 )

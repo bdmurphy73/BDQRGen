@@ -160,14 +160,6 @@ fun ContactScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-        Text(
-            text = "Contact QR Code Generator",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
-        
-        Spacer(modifier = Modifier.height(20.dp))
-        
         Button(
             onClick = {
                 if (hasContactsPermission) {
@@ -278,17 +270,26 @@ fun ContactScreen(
                             }
                         }
                     },
-                    onShare = {
-                        state.bitmap?.let { bitmap ->
-                            viewModel.shareQRCode(bitmap)
-                        }
-                    },
                     onEmail = {
-                        val vCard = QRCodeGenerator.generateVCardString(name, phone, email)
-                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:?subject=Contact QR Code&body=${Uri.encode(vCard)}")
+                        state.bitmap?.let { bitmap ->
+                            val uri = viewModel.saveToCache(context, bitmap)
+                            if (uri != null) {
+                                val vCard = QRCodeGenerator.generateVCardString(name, phone, email)
+                                val contactInfo = buildString {
+                                    append("Name: $name\n")
+                                    if (phone.isNotBlank()) append("Phone: $phone\n")
+                                    if (email.isNotBlank()) append("Email: $email\n")
+                                }
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "image/png"
+                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                    putExtra(Intent.EXTRA_SUBJECT, "QR Code - BDQRGen")
+                                    putExtra(Intent.EXTRA_TEXT, "$contactInfo\n\n$vCard")
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                context.startActivity(Intent.createChooser(intent, "Send QR Code"))
+                            }
                         }
-                        context.startActivity(intent)
                     },
                     enabled = state.bitmap != null
                 )

@@ -1,8 +1,10 @@
 package com.bdqrgen.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.bdqrgen.util.ImageHelper
@@ -13,6 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 data class QrCodeState(
     val bitmap: Bitmap? = null,
@@ -148,6 +152,27 @@ class QRViewModel(application: Application) : AndroidViewModel(application) {
                 loadSavedImages()
             }
             onComplete(success)
+        }
+    }
+    
+    fun saveToCache(context: Context, bitmap: Bitmap): Uri? {
+        return try {
+            val cachePath = File(context.cacheDir, "images")
+            cachePath.mkdirs()
+            
+            val file = File(cachePath, "qrcode_email.png")
+            FileOutputStream(file).use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            }
+            
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
     
