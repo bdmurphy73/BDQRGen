@@ -54,7 +54,7 @@ class QRViewModel(application: Application) : AndroidViewModel(application) {
             _websiteQrState.value = _websiteQrState.value.copy(isLoading = true)
             
             val bitmap = withContext(Dispatchers.Default) {
-                QRCodeGenerator.generateQRCode(url)
+                QRCodeGenerator.generateWebsiteQRWithText(url)
             }
             
             _websiteQrState.value = QrCodeState(
@@ -74,9 +74,8 @@ class QRViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _wifiQrState.value = _wifiQrState.value.copy(isLoading = true)
             
-            val wifiString = QRCodeGenerator.generateWifiString(ssid, password)
             val bitmap = withContext(Dispatchers.Default) {
-                QRCodeGenerator.generateQRCode(wifiString)
+                QRCodeGenerator.generateWifiQRWithText(ssid, password)
             }
             
             _wifiQrState.value = QrCodeState(
@@ -96,9 +95,8 @@ class QRViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _contactQrState.value = _contactQrState.value.copy(isLoading = true)
             
-            val vCardString = QRCodeGenerator.generateVCardString(name, phone, email)
             val bitmap = withContext(Dispatchers.Default) {
-                QRCodeGenerator.generateQRCode(vCardString)
+                QRCodeGenerator.generateContactQRWithText(name, phone, email)
             }
             
             _contactQrState.value = QrCodeState(

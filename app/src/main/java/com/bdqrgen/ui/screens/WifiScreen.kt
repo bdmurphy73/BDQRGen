@@ -116,7 +116,7 @@ fun WifiScreen(
                     modifier = Modifier.padding(top = 16.dp)
                 )
                 Text(
-                    text = "Password: ••••••••",
+                    text = "Password: $password",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
