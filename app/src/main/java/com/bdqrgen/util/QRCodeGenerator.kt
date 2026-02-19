@@ -67,31 +67,79 @@ object QRCodeGenerator {
     }
     
     private fun addTextBelowQRCode(qrBitmap: Bitmap, text: String): Bitmap {
-        val combinedHeight = QR_SIZE + TEXT_HEIGHT
+        val paint = Paint().apply {
+            color = Color.BLACK
+            textSize = 28f
+            typeface = Typeface.DEFAULT
+            isAntiAlias = true
+            textAlign = Paint.Align.LEFT
+        }
+        
+        val maxWidth = QR_SIZE - 40
+        val wrappedLines = wrapText(text, paint, maxWidth)
+        
+        val lineHeight = paint.fontMetrics.bottom - paint.fontMetrics.top + 8
+        val textAreaHeight = (wrappedLines.size * lineHeight).toInt() + 40
+        
+        val combinedHeight = QR_SIZE + textAreaHeight
         val combinedBitmap = Bitmap.createBitmap(QR_SIZE, combinedHeight, Bitmap.Config.RGB_565)
         val canvas = Canvas(combinedBitmap)
         
         canvas.drawColor(Color.WHITE)
-        
         canvas.drawBitmap(qrBitmap, 0f, 0f, null)
         
-        val paint = Paint().apply {
-            color = Color.BLACK
-            textSize = 32f
-            typeface = Typeface.DEFAULT
-            isAntiAlias = true
-            textAlign = Paint.Align.CENTER
-        }
-        
-        val lines = text.split("\n")
-        val lineHeight = TEXT_HEIGHT.toFloat() / lines.size
-        
-        lines.forEachIndexed { index, line ->
-            val y = QR_SIZE + (index + 1) * lineHeight - 10
-            canvas.drawText(line, QR_SIZE / 2f, y, paint)
+        val startY = QR_SIZE + 30f
+        wrappedLines.forEachIndexed { index, line ->
+            val y = startY + index * lineHeight
+            canvas.drawText(line, 20f, y, paint)
         }
         
         return combinedBitmap
+    }
+    
+    private fun wrapText(text: String, paint: Paint, maxWidth: Float): List<String> {
+        val lines = mutableListOf<String>()
+        val inputLines = text.split("\n")
+        
+        inputLines.forEach { line ->
+            if (paint.measureText(line) <= maxWidth) {
+                lines.add(line)
+            } else {
+                val words = line.split(" ")
+                var currentLine = StringBuilder()
+                
+                words.forEach { word ->
+                    val testLine = if (currentLine.isEmpty()) word else "$currentLine $word"
+                    if (paint.measureText(testLine) <= maxWidth) {
+                        currentLine.append(if (currentLine.isEmpty()) word else " $word")
+                    } else {
+                        if (currentLine.isNotEmpty()) {
+                            lines.add(currentLine.toString())
+                        }
+                        if (paint.measureText(word) > maxWidth) {
+                            var remaining = word
+                            while (remaining.isNotEmpty()) {
+                                var i = remaining.length
+                                while (i > 0 && paint.measureText(remaining.substring(0, i)) > maxWidth) {
+                                    i--
+                                }
+                                if (i == 0) i = 1
+                                lines.add(remaining.substring(0, i))
+                                remaining = remaining.substring(i)
+                            }
+                        } else {
+                            currentLine = StringBuilder(word)
+                        }
+                    }
+                }
+                
+                if (currentLine.isNotEmpty()) {
+                    lines.add(currentLine.toString())
+                }
+            }
+        }
+        
+        return lines
     }
     
     fun generateWifiString(ssid: String, password: String): String {
