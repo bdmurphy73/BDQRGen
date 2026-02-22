@@ -75,7 +75,7 @@ object QRCodeGenerator {
             textAlign = Paint.Align.LEFT
         }
         
-        val maxWidth = QR_SIZE - 40
+        val maxWidth = (QR_SIZE - 40).toFloat()
         val wrappedLines = wrapText(text, paint, maxWidth)
         
         val lineHeight = paint.fontMetrics.bottom - paint.fontMetrics.top + 8
