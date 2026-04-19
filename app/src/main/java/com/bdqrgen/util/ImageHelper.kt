@@ -1,4 +1,4 @@
-package com.bdqrgen.util
+package com.umbraqrgen.util
 
 import android.content.ContentValues
 import android.content.Context
@@ -8,11 +8,15 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 
 object ImageHelper {
+    
+    private const val TAG = "ImageHelper"
+    private const val GALLERY_FOLDER = "UmbraQRGen"
     
     fun saveImageToGallery(context: Context, bitmap: Bitmap, fileName: String = "qrcode_${System.currentTimeMillis()}"): Uri? {
         return try {
@@ -20,7 +24,7 @@ object ImageHelper {
                 val contentValues = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, "$fileName.png")
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/BDQRGen")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/" + GALLERY_FOLDER)
                 }
                 
                 val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
@@ -33,7 +37,7 @@ object ImageHelper {
             } else {
                 val directory = File(
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                    "BDQRGen"
+                    GALLERY_FOLDER
                 )
                 if (!directory.exists()) {
                     directory.mkdirs()
@@ -47,7 +51,7 @@ object ImageHelper {
                 Uri.fromFile(file)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Failed to save image to gallery", e)
             null
         }
     }
@@ -78,7 +82,7 @@ object ImageHelper {
             
             uri
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Failed to share image", e)
             null
         }
     }
@@ -94,7 +98,7 @@ object ImageHelper {
             )
             
             val selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
-            val selectionArgs = arrayOf("%BDQRGen%")
+            val selectionArgs = arrayOf("%$GALLERY_FOLDER%")
             
             val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
             
@@ -119,7 +123,7 @@ object ImageHelper {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Failed to load saved images", e)
         }
         
         return images
@@ -129,7 +133,7 @@ object ImageHelper {
         return try {
             context.contentResolver.delete(uri, null, null) > 0
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Failed to delete image", e)
             false
         }
     }

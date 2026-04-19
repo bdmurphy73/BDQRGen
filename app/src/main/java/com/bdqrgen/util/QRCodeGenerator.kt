@@ -1,10 +1,11 @@
-package com.bdqrgen.util
+package com.umbraqrgen.util
 
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.Canvas
+import android.util.Log
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -12,8 +13,8 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 
 object QRCodeGenerator {
     
+    private const val TAG = "QRCodeGenerator"
     private const val QR_SIZE = 512
-    private const val TEXT_HEIGHT = 80
     
     fun generateQRCode(content: String, size: Int = QR_SIZE): Bitmap? {
         return try {
@@ -28,7 +29,7 @@ object QRCodeGenerator {
             
             val width = bitMatrix.width
             val height = bitMatrix.height
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             
             for (x in 0 until width) {
                 for (y in 0 until height) {
@@ -38,7 +39,7 @@ object QRCodeGenerator {
             
             bitmap
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Failed to generate QR code", e)
             null
         }
     }
@@ -82,7 +83,7 @@ object QRCodeGenerator {
         val textAreaHeight = (wrappedLines.size * lineHeight).toInt() + 40
         
         val combinedHeight = QR_SIZE + textAreaHeight
-        val combinedBitmap = Bitmap.createBitmap(QR_SIZE, combinedHeight, Bitmap.Config.RGB_565)
+        val combinedBitmap = Bitmap.createBitmap(QR_SIZE, combinedHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(combinedBitmap)
         
         canvas.drawColor(Color.WHITE)

@@ -1,4 +1,4 @@
-package com.bdqrgen.ui.screens
+package com.umbraqrgen.ui.screens
 
 import android.content.Intent
 import android.net.Uri
@@ -26,8 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.bdqrgen.AppVersion
-import com.bdqrgen.ui.components.WatermarkBackground
+import com.umbraqrgen.AppVersion
+import com.umbraqrgen.ui.components.WatermarkBackground
 
 @Composable
 fun AboutScreen(
@@ -66,7 +66,7 @@ fun AboutScreen(
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bdmurphy73/BDQRGen"))
                 context.startActivity(intent)
             }) {
-                Text("https://github.com/bdmurphy73/BDQRGen")
+                Text("https://github.com/bdmurphy73/UmbraQRGen")
             }
             
             Spacer(modifier = Modifier.height(8.dp))

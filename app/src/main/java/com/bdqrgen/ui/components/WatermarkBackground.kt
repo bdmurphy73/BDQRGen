@@ -1,4 +1,4 @@
-package com.bdqrgen.ui.components
+package com.umbraqrgen.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -11,7 +11,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.bdqrgen.R
+import com.umbraqrgen.R
 
 @Composable
 fun WatermarkBackground(

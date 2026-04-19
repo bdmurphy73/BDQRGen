@@ -1,4 +1,4 @@
-package com.bdqrgen.ui.screens
+package com.umbraqrgen.ui.screens
 
 import android.content.Intent
 import android.net.Uri
@@ -35,10 +35,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.bdqrgen.ui.components.QRCodeImage
-import com.bdqrgen.ui.components.QRActionButtons
-import com.bdqrgen.ui.components.WatermarkBackground
-import com.bdqrgen.viewmodel.QRViewModel
+import com.umbraqrgen.ui.components.QRCodeImage
+import com.umbraqrgen.ui.components.QRActionButtons
+import com.umbraqrgen.ui.components.WatermarkBackground
+import com.umbraqrgen.viewmodel.QRViewModel
 
 @Composable
 fun WebsiteScreen(
@@ -115,7 +115,7 @@ fun WebsiteScreen(
                                 val intent = Intent(Intent.ACTION_SEND).apply {
                                     type = "image/png"
                                     putExtra(Intent.EXTRA_STREAM, uri)
-                                    putExtra(Intent.EXTRA_SUBJECT, "QR Code - BDQRGen")
+                                    putExtra(Intent.EXTRA_SUBJECT, "QR Code - UmbraQRGen")
                                     putExtra(Intent.EXTRA_TEXT, "QR Code for: $url")
                                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }

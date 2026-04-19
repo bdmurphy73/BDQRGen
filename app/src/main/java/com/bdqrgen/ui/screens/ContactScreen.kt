@@ -1,4 +1,4 @@
-package com.bdqrgen.ui.screens
+package com.umbraqrgen.ui.screens
 
 import android.Manifest
 import android.content.Intent
@@ -43,11 +43,11 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.bdqrgen.ui.components.QRCodeImage
-import com.bdqrgen.ui.components.QRActionButtons
-import com.bdqrgen.ui.components.WatermarkBackground
-import com.bdqrgen.util.QRCodeGenerator
-import com.bdqrgen.viewmodel.QRViewModel
+import com.umbraqrgen.ui.components.QRCodeImage
+import com.umbraqrgen.ui.components.QRActionButtons
+import com.umbraqrgen.ui.components.WatermarkBackground
+import com.umbraqrgen.util.QRCodeGenerator
+import com.umbraqrgen.viewmodel.QRViewModel
 
 @Composable
 fun ContactScreen(
@@ -262,7 +262,7 @@ fun ContactScreen(
                                 val intent = Intent(Intent.ACTION_SEND).apply {
                                     type = "image/png"
                                     putExtra(Intent.EXTRA_STREAM, uri)
-                                    putExtra(Intent.EXTRA_SUBJECT, "QR Code - BDQRGen")
+                                    putExtra(Intent.EXTRA_SUBJECT, "QR Code - UmbraQRGen")
                                     putExtra(Intent.EXTRA_TEXT, "$contactInfo\n\n$vCard")
                                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }

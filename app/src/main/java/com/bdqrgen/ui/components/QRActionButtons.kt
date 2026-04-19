@@ -1,4 +1,4 @@
-package com.bdqrgen.ui.components
+package com.umbraqrgen.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

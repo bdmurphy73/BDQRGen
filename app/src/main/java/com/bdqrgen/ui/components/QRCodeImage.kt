@@ -1,4 +1,4 @@
-package com.bdqrgen.ui.components
+package com.umbraqrgen.ui.components
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image

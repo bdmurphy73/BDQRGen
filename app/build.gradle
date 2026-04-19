@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.bdqrgen'
+    namespace 'com.umbraqrgen'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.bdqrgen"
+        applicationId "com.umbraqrgen"
         minSdk 24
         targetSdk 35
         versionCode 6
@@ -23,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

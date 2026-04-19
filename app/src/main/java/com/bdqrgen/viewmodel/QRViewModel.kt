@@ -1,14 +1,15 @@
-package com.bdqrgen.viewmodel
+package com.umbraqrgen.viewmodel
 
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.bdqrgen.util.ImageHelper
-import com.bdqrgen.util.QRCodeGenerator
+import com.umbraqrgen.util.ImageHelper
+import com.umbraqrgen.util.QRCodeGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +32,8 @@ data class SavedImagesState(
 )
 
 class QRViewModel(application: Application) : AndroidViewModel(application) {
+    
+    private val TAG = "QRViewModel"
     
     private val _websiteQrState = MutableStateFlow(QrCodeState())
     val websiteQrState: StateFlow<QrCodeState> = _websiteQrState.asStateFlow()
@@ -169,7 +172,7 @@ class QRViewModel(application: Application) : AndroidViewModel(application) {
                 file
             )
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Failed to save to cache", e)
             null
         }
     }

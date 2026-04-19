@@ -1,4 +1,4 @@
-package com.bdqrgen
+package com.umbraqrgen
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -57,19 +57,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bdqrgen.ui.screens.AboutScreen
-import com.bdqrgen.ui.screens.ContactScreen
-import com.bdqrgen.ui.screens.SavedScreen
-import com.bdqrgen.ui.screens.WifiScreen
-import com.bdqrgen.ui.screens.WebsiteScreen
-import com.bdqrgen.viewmodel.QRViewModel
+import com.umbraqrgen.ui.screens.AboutScreen
+import com.umbraqrgen.ui.screens.ContactScreen
+import com.umbraqrgen.ui.screens.SavedScreen
+import com.umbraqrgen.ui.screens.WifiScreen
+import com.umbraqrgen.ui.screens.WebsiteScreen
+import com.umbraqrgen.viewmodel.QRViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            BDQRGenApp()
+            UmbraQRGenApp()
         }
     }
 }
@@ -82,7 +82,7 @@ data class NavItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BDQRGenApp() {
+fun UmbraQRGenApp() {
     val viewModel: QRViewModel = viewModel()
     var selectedRoute by remember { mutableIntStateOf(0) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -122,7 +122,7 @@ fun BDQRGenApp() {
                     }
                     
                     Text(
-                        text = "BD QR Generator",
+                        text = "UmbraQRGen",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -188,7 +188,7 @@ fun BDQRGenApp() {
                 TopAppBar(
                     title = {
                         Text(
-                            text = "BD QR Generator",
+                            text = "UmbraQRGen",
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center
                         )

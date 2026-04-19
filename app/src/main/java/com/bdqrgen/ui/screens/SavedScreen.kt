@@ -1,4 +1,4 @@
-package com.bdqrgen.ui.screens
+package com.umbraqrgen.ui.screens
 
 import android.Manifest
 import android.content.Intent
@@ -61,8 +61,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
-import com.bdqrgen.ui.components.WatermarkBackground
-import com.bdqrgen.viewmodel.QRViewModel
+import com.umbraqrgen.ui.components.WatermarkBackground
+import com.umbraqrgen.viewmodel.QRViewModel
 
 @Composable
 fun SavedScreen(
@@ -269,7 +269,7 @@ fun SavedScreen(
                                         val intent = Intent(Intent.ACTION_SEND).apply {
                                             type = "image/png"
                                             putExtra(Intent.EXTRA_STREAM, emailUri)
-                                            putExtra(Intent.EXTRA_SUBJECT, "QR Code - BDQRGen")
+                                            putExtra(Intent.EXTRA_SUBJECT, "QR Code - UmbraQRGen")
                                             putExtra(Intent.EXTRA_TEXT, "QR Code: $fileName")
                                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                         }
