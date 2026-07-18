@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace 'com.umbraqrgen'
+    namespace 'com.umbratools.umbraqrgen'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.umbraqrgen"
+        applicationId "com.umbratools.UmbraQRGen"
         minSdk 24
         targetSdk 35
-        versionCode 6
-        versionName "0.6.5"
+        versionCode 10
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

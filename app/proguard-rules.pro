@@ -5,8 +5,8 @@
 -dontwarn com.google.zxing.**
 
 # Keep app entry points and public API
--keep class com.umbraqrgen.MainActivity { *; }
--keep class com.umbraqrgen.AppVersion { *; }
+-keep class com.umbratools.umbraqrgen.MainActivity { *; }
+-keep class com.umbratools.umbraqrgen.AppVersion { *; }
 
 # Keep Compose runtime classes
 -keep class androidx.compose.** { *; }
