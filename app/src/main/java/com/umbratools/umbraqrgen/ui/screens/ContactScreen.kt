@@ -3,7 +3,6 @@ package com.umbratools.umbraqrgen.ui.screens
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.provider.ContactsContract
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -244,7 +242,7 @@ fun ContactScreen(
                 QRActionButtons(
                     onSave = {
                         state.bitmap?.let { bitmap ->
-                            viewModel.saveQRCode(bitmap) { success, message ->
+                            viewModel.saveQRCode(bitmap) { _, _ ->
                                 viewModel.clearMessages()
                             }
                         }
@@ -270,7 +268,7 @@ fun ContactScreen(
                             }
                         }
                     },
-                    enabled = state.bitmap != null
+                    enabled = true
                 )
             }
         } else {

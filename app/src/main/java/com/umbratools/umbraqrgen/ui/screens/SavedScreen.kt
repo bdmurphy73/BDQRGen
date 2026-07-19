@@ -1,14 +1,9 @@
 package com.umbratools.umbraqrgen.ui.screens
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,7 +56,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.ContextCompat
 import com.umbratools.umbraqrgen.ui.components.WatermarkBackground
 import com.umbratools.umbraqrgen.viewmodel.QRViewModel
 
@@ -78,33 +72,8 @@ fun SavedScreen(
     var selectedImage by remember { mutableStateOf<Pair<String, Uri>?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Manifest.permission.READ_MEDIA_IMAGES
-    } else {
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    }
-
-    var hasPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasPermission = isGranted
-        if (isGranted) {
-            viewModel.loadSavedImages()
-        }
-    }
-
     LaunchedEffect(Unit) {
-        if (!hasPermission) {
-            permissionLauncher.launch(permission)
-        } else {
-            viewModel.loadSavedImages()
-        }
+        viewModel.loadSavedImages()
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -115,24 +84,7 @@ fun SavedScreen(
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
-            if (!hasPermission) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "Permission required to view saved QR codes",
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        TextButton(onClick = { permissionLauncher.launch(permission) }) {
-                            Text("Grant Permission")
-                        }
-                    }
-                }
-            } else if (state.isLoading) {
+            if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center

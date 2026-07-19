@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 fun QRActionButtons(
     onSave: () -> Unit,
     onEmail: () -> Unit,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Row(
         modifier = modifier

@@ -6,6 +6,8 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.Canvas
 import android.util.Log
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -15,6 +17,7 @@ object QRCodeGenerator {
     
     private const val TAG = "QRCodeGenerator"
     private const val QR_SIZE = 512
+    private const val TEXT_MAX_WIDTH = 472f
     
     fun generateQRCode(content: String, size: Int = QR_SIZE): Bitmap? {
         return try {
@@ -29,11 +32,11 @@ object QRCodeGenerator {
             
             val width = bitMatrix.width
             val height = bitMatrix.height
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val bitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
             
             for (x in 0 until width) {
                 for (y in 0 until height) {
-                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+                    bitmap[x, y] = if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
                 }
             }
             
@@ -76,14 +79,14 @@ object QRCodeGenerator {
             textAlign = Paint.Align.LEFT
         }
         
-        val maxWidth = (QR_SIZE - 40).toFloat()
+        val maxWidth = TEXT_MAX_WIDTH
         val wrappedLines = wrapText(text, paint, maxWidth)
         
         val lineHeight = paint.fontMetrics.bottom - paint.fontMetrics.top + 8
         val textAreaHeight = (wrappedLines.size * lineHeight).toInt() + 40
         
         val combinedHeight = QR_SIZE + textAreaHeight
-        val combinedBitmap = Bitmap.createBitmap(QR_SIZE, combinedHeight, Bitmap.Config.ARGB_8888)
+        val combinedBitmap = createBitmap(QR_SIZE, combinedHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(combinedBitmap)
         
         canvas.drawColor(Color.WHITE)
@@ -141,10 +144,6 @@ object QRCodeGenerator {
         }
         
         return lines
-    }
-    
-    fun generateWifiString(ssid: String, password: String): String {
-        return "WIFI:T:WPA;S:${escapeWifiString(ssid)};P:${escapeWifiString(password)};;"
     }
     
     fun generateVCardString(name: String, phone: String, email: String): String {

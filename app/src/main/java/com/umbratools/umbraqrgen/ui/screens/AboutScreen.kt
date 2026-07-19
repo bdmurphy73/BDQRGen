@@ -1,7 +1,6 @@
 package com.umbratools.umbraqrgen.ui.screens
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,12 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -24,8 +21,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.umbratools.umbraqrgen.AppVersion
 import com.umbratools.umbraqrgen.ui.components.WatermarkBackground
 
@@ -63,7 +60,7 @@ fun AboutScreen(
             )
             
             TextButton(onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bdmurphy73/UmbraQRGen"))
+                val intent = Intent(Intent.ACTION_VIEW, "https://github.com/bdmurphy73/UmbraQRGen".toUri())
                 context.startActivity(intent)
             }) {
                 Text("https://github.com/bdmurphy73/UmbraQRGen")
@@ -79,7 +76,7 @@ fun AboutScreen(
             }
             
             TextButton(onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://buymeacoffee.com/bdmurph73i"))
+                val intent = Intent(Intent.ACTION_VIEW, "https://buymeacoffee.com/bdmurph73i".toUri())
                 context.startActivity(intent)
             }) {
                 Text(buyMeACoffeeText)
@@ -95,7 +92,7 @@ fun AboutScreen(
             }
             
             TextButton(onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://authorbdmurphy.com/"))
+                val intent = Intent(Intent.ACTION_VIEW, "https://authorbdmurphy.com/".toUri())
                 context.startActivity(intent)
             }) {
                 Text(websiteText)
@@ -151,7 +148,7 @@ fun AboutScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             TextButton(onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bdmurphy73/UmbraQRGen/blob/Android/Privacy_TermsOfService.txt"))
+                val intent = Intent(Intent.ACTION_VIEW, "https://github.com/bdmurphy73/UmbraQRGen/blob/Android/Privacy_TermsOfService.txt".toUri())
                 context.startActivity(intent)
             }) {
                 Text("Privacy Terms of Service", color = Color.Blue)

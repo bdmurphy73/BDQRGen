@@ -10,6 +10,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.content.FileProvider
+import org.json.JSONArray
 import java.io.File
 import java.io.FileOutputStream
 
@@ -17,10 +18,12 @@ object ImageHelper {
     
     private const val TAG = "ImageHelper"
     private const val GALLERY_FOLDER = "UmbraQRGen"
+    private const val PREFS_NAME = "saved_qr_images"
+    private const val KEY_ENTRIES = "image_entries"
     
     fun saveImageToGallery(context: Context, bitmap: Bitmap, fileName: String = "qrcode_${System.currentTimeMillis()}"): Uri? {
         return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val savedUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val contentValues = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, "$fileName.png")
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
@@ -50,6 +53,12 @@ object ImageHelper {
                 
                 Uri.fromFile(file)
             }
+            
+            if (savedUri != null) {
+                trackEntry(context, "$fileName.png", savedUri.toString())
+            }
+            
+            savedUri
         } catch (e: Exception) {
             Log.e(TAG, "Failed to save image to gallery", e)
             null
@@ -88,53 +97,76 @@ object ImageHelper {
     }
     
     fun getSavedImages(context: Context): List<Pair<String, Uri>> {
-        val images = mutableListOf<Pair<String, Uri>>()
+        val entries = getTrackedEntries(context)
+        val valid = mutableListOf<Pair<String, Uri>>()
+        val updated = mutableListOf<String>()
         
-        try {
-            val projection = arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DISPLAY_NAME,
-                MediaStore.Images.Media.DATE_ADDED
-            )
+        for (entry in entries) {
+            val parts = entry.split("\n", limit = 2)
+            if (parts.size != 2) continue
+            val name = parts[0]
+            val uriString = parts[1]
+            val uri = Uri.parse(uriString)
             
-            val selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
-            val selectionArgs = arrayOf("%$GALLERY_FOLDER%")
-            
-            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-            
-            context.contentResolver.query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                sortOrder
-            )?.use { cursor ->
-                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-                
-                while (cursor.moveToNext()) {
-                    val id = cursor.getLong(idColumn)
-                    val name = cursor.getString(nameColumn)
-                    val contentUri = Uri.withAppendedPath(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        id.toString()
-                    )
-                    images.add(name to contentUri)
+            try {
+                context.contentResolver.openInputStream(uri)?.use { stream ->
+                    stream.read()
                 }
+                valid.add(name to uri)
+                updated.add(entry)
+            } catch (_: Exception) {
+                // URI no longer valid
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to load saved images", e)
         }
         
-        return images
+        if (updated.size != entries.size) {
+            saveTrackedEntries(context, updated)
+        }
+        
+        return valid
     }
     
     fun deleteImage(context: Context, uri: Uri): Boolean {
         return try {
-            context.contentResolver.delete(uri, null, null) > 0
+            val deleted = context.contentResolver.delete(uri, null, null) > 0
+            if (deleted) {
+                removeTrackedEntry(context, uri.toString())
+            }
+            deleted
         } catch (e: Exception) {
             Log.e(TAG, "Failed to delete image", e)
             false
         }
+    }
+    
+    private fun getPrefs(context: Context) =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    
+    private fun getTrackedEntries(context: Context): List<String> {
+        val json = getPrefs(context).getString(KEY_ENTRIES, null) ?: return emptyList()
+        return try {
+            val array = JSONArray(json)
+            (0 until array.length()).map { array.getString(it) }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+    
+    private fun saveTrackedEntries(context: Context, entries: List<String>) {
+        val array = JSONArray()
+        entries.forEach { array.put(it) }
+        getPrefs(context).edit().putString(KEY_ENTRIES, array.toString()).apply()
+    }
+    
+    private fun trackEntry(context: Context, name: String, uri: String) {
+        val current = getTrackedEntries(context).toMutableList()
+        current.add(0, "$name\n$uri")
+        saveTrackedEntries(context, current)
+    }
+    
+    private fun removeTrackedEntry(context: Context, uri: String) {
+        val current = getTrackedEntries(context).toMutableList()
+        current.removeAll { it.endsWith("\n$uri") }
+        saveTrackedEntries(context, current)
     }
 }

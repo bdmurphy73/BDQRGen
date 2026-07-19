@@ -124,10 +124,6 @@ class QRViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    fun shareQRCode(bitmap: Bitmap) {
-        ImageHelper.shareImage(getApplication(), bitmap)
-    }
-    
     fun loadSavedImages() {
         viewModelScope.launch {
             _savedImagesState.value = _savedImagesState.value.copy(isLoading = true)
